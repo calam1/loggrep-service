@@ -1,6 +1,6 @@
 # loggrep-service
 
-FIXME
+Major WIP - not close to being ready for prime time
 
 ## Prerequisites
 
