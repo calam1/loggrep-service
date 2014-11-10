@@ -16,8 +16,8 @@
      (when (seq lines)
        (let [[date time thread_id remote_host uri log_level logger value] (parse-line-ocp (first lines))
                              ;creates s nested map of date and time
-                            state (assoc-in state [date time]
-                                            (conj (get-in state [date time] []) (str date " " time " " thread_id " " remote_host " " uri " " log_level " " logger " " value)))]
+                            state (assoc-in state [date "data"]
+                                            (conj (get-in state [date "data"] []) (str date " " time " " thread_id " " remote_host " " uri " " log_level " " logger " " value)))]
          (if (= grouping date)
             (cons (get state date) (group-by-date grouping (rest lines)
                                                      (dissoc state date)))
@@ -31,8 +31,8 @@
     (lazy-seq
      (when (seq lines)
        (let [[date time thread_id remote_host uri log_level logger value] (parse-line-ocp (first lines))
-                            state (assoc-in state [thread_id time]
-                                            (conj (get-in state [thread_id time] []) (str date " " time " " thread_id " " remote_host " " uri " " log_level " " logger " " value)))]
+                            state (assoc-in state [thread_id "data"]
+                                            (conj (get-in state [thread_id "data"] []) (str date " " time " " thread_id " " remote_host " " uri " " log_level " " logger " " value)))]
          (if (= grouping thread_id)
             (cons (get state thread_id) (group-by-thread-id grouping (rest lines)
                                                      (dissoc state thread_id)))
@@ -53,4 +53,4 @@
 
 (defn hardcoded-search-values
   []
-  (json/write-str (parse-log-file-by-date  "2014-10-23" "data/cat.out")))
+  (json/write-str (parse-log-file-by-date "2014-10-23" "data/cat.out")))
