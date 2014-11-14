@@ -1,6 +1,7 @@
 (ns loggrep-service.core.filter
   (:require [clojure.java.io :as io]
             [clojure.data.json :as json]
+            [cheshire.core :refer :all]
             [me.raynes.conch :refer [programs] :as sh]))
 
 (import '(java.io BufferedReader StringReader))
@@ -91,3 +92,15 @@
 (defn grep-and-group-by-date-json
   [criteria search-date file]
   (json/write-str (grep-and-group-by-date criteria search-date file)))
+
+(defn grep-and-group-by-date-json-logexists
+  [criteria search-date]
+  (grep-and-group-by-date-json criteria search-date "data/catalina.out.5"))
+
+(defn grep-and-group-by-date-cheshire
+  [criteria search-date file]
+  (generate-string (grep-and-group-by-date criteria search-date file) {:escape-non-ascii true}))
+
+(defn grep-and-group-by-date-json-pprint
+  [criteria search-date file]
+  (clojure.pprint/pprint (json/write-str (grep-and-group-by-date criteria search-date file))))

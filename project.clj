@@ -5,6 +5,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.2.0"]
                  [org.clojure/data.json "0.2.5"]
+                 [cheshire "5.3.1"]
                  [me.raynes/conch "0.8.0"]
                  [ring/ring-defaults "0.1.2"]]
   :plugins [[lein-ring "0.8.13"]]
