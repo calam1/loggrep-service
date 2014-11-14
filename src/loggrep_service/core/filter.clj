@@ -73,10 +73,6 @@
   [search_date stream]
   (parse-log-stream-by-date search_date (line-seq (BufferedReader. (StringReader. stream)))))
 
-(defn echo
-  [s]
-  ((sh/programs echo) s))
-
 (defn grep-file
   [criteria file]
   (try
