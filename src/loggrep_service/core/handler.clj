@@ -7,6 +7,7 @@
 (defroutes app-routes
   (GET "/" [] "Hello World")
   (GET "/filter" [] (filter/hardcoded-search-values))
+  (GET "/search/:search_date" [search_date] (filter/search-by-date search_date))
   (route/not-found "Not Found"))
 
 (def app

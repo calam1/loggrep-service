@@ -1,6 +1,9 @@
 (ns loggrep-service.core.filter
   (:require [clojure.java.io :as io]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [me.raynes.conch :refer [programs] :as sh]))
+
+(import '(java.io BufferedReader StringReader))
 
 (defn parse-line-ocp
   [str]
@@ -23,7 +26,6 @@
                                                      (dissoc state date)))
             (group-by-date grouping (rest lines) state)))))))
 
-
 (defn group-by-thread-id
   ([grouping lines]
     (group-by-thread-id grouping lines {}))
@@ -45,8 +47,16 @@
       (doall
         (group-by-attribute grouping (line-seq logfile))))))
 
+(defn filter-by-attribute-stream
+  [group-by-attribute]
+  (fn [grouping stream]
+     (group-by-attribute grouping stream)))
+
 (def parse-log-file-by-date
   (filter-by-attribute group-by-date))
+
+(def parse-log-stream-by-date
+  (filter-by-attribute-stream group-by-date))
 
 (def parse-log-file-by-thread-id
   (filter-by-attribute group-by-thread-id))
@@ -54,3 +64,34 @@
 (defn hardcoded-search-values
   []
   (json/write-str (parse-log-file-by-date "2014-10-23" "data/cat.out")))
+
+(defn search-by-date
+  [search_date]
+  (json/write-str (parse-log-file-by-date search_date "data/cat.out")))
+
+(defn search-by-date-stream
+  [search_date stream]
+  (parse-log-stream-by-date search_date (line-seq (BufferedReader. (StringReader. stream)))))
+
+(defn echo
+  [s]
+  ((sh/programs echo) s))
+
+(defn grep-file
+  [criteria file]
+  (try
+    ((sh/programs grep) "-i" criteria {:in (java.io.File. file)})
+    (catch Exception e "no criteria found")))
+
+(defn grep-stream
+  [criteria stream]
+    ((sh/programs grep) "-i" criteria stream))
+
+(defn grep-and-group-by-date
+  [criteria search-date file]
+  (->> (search-by-date-stream search-date
+       (grep-file criteria file))))
+
+(defn grep-and-group-by-date-json
+  [criteria search-date file]
+  (json/write-str (grep-and-group-by-date criteria search-date file)))
